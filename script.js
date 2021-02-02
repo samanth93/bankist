@@ -73,12 +73,17 @@ const displayMovements = function (movements) {
       <div class="movements__value">${movement}€</div>
     </div>
   `;
-    containerMovements.insertAdjacentHTML("beforeend", html);
+    containerMovements.insertAdjacentHTML("afterbegin", html);
   });
 };
-const calcPrintBalance = function (movements) {
-  const balance = movements.reduce((acc, mov, i, arr) => acc + mov, 0);
+const calcPrintBalance = function (currentAcc) {
+  const balance = currentAcc.movements.reduce(
+    (acc, mov, i, arr) => acc + mov,
+    0
+  );
   labelBalance.textContent = `${balance} EUR`;
+  // currentAcc.balance = currentAcc.movements.reduce((acc, mov) => acc + mov, 0);
+  currentAcc.balance = balance;
 };
 const displayDepositSummary = function (movements) {
   const value = movements
@@ -119,7 +124,14 @@ let currentUser;
 // });
 
 // or
-
+const updateUI = function (acc) {
+  console.log(acc);
+  displayMovements(acc.movements);
+  calcPrintBalance(acc);
+  displayDepositSummary(acc.movements);
+  displayWithdrawlSummary(acc.movements);
+  calInterest(acc);
+};
 btnLogin.addEventListener("click", function (e) {
   e.preventDefault();
   currentUser = accounts.find((acc) => {
@@ -134,14 +146,48 @@ btnLogin.addEventListener("click", function (e) {
       currentUser.owner.split(" ")[0]
     }`;
     containerApp.style.opacity = 100;
-    displayMovements(currentUser.movements);
-    calcPrintBalance(currentUser.movements);
-    displayDepositSummary(currentUser.movements);
-    displayWithdrawlSummary(currentUser.movements);
-    calInterest(currentUser);
+    updateUI(currentUser);
   }
 });
-
+btnTransfer.addEventListener("click", function (e) {
+  e.preventDefault();
+  const receiverAcc = accounts.find(
+    (acc) => acc.userName.toLowerCase() === inputTransferTo.value.toLowerCase()
+  );
+  // .movements.push(Number(inputTransferAmount.value));
+  const amount = Number(inputTransferAmount.value);
+  console.log(amount);
+  if (
+    amount > 0 &&
+    receiverAcc &&
+    currentUser.balance >= amount &&
+    receiverAcc?.userName !== currentUser.userName
+  ) {
+    currentUser.movements.push(-amount);
+    receiverAcc.movements.push(amount);
+    console.log("Transfer valid");
+    console.log(currentUser);
+    updateUI(currentUser);
+  }
+});
+btnClose.addEventListener("click", function (e) {
+  e.preventDefault();
+  console.log(accounts);
+  const inputCloseUsernameValue = inputCloseUsername.value.toLowerCase();
+  const inputClosePinValue = Number(inputClosePin.value);
+  if (
+    inputCloseUsernameValue === currentUser.userName.toLowerCase() &&
+    currentUser.pin === inputClosePinValue
+  ) {
+    const index = accounts.findIndex(function (acc) {
+      return acc.userName.toLowerCase() === currentUser.userName.toLowerCase();
+    });
+    console.log(index);
+    accounts.splice(index, 1);
+    containerApp.style.opacity = 0;
+    inputCloseUsername.value = inputClosePin.value = "";
+  }
+});
 createUserNames(accounts);
 
 /////////////////////////////////////////////////
