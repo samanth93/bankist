@@ -188,6 +188,20 @@ btnClose.addEventListener("click", function (e) {
     inputCloseUsername.value = inputClosePin.value = "";
   }
 });
+btnLoan.addEventListener("click", function (e) {
+  e.preventDefault();
+  const inputLoanAmountValue = Number(inputLoanAmount.value);
+  if (
+    inputLoanAmountValue > 0 &&
+    currentUser.movements.some(
+      (mov) => mov > 0 && inputLoanAmountValue <= 0.1 * mov
+    )
+  ) {
+    currentUser.movements.push(inputLoanAmountValue);
+    updateUI(currentUser);
+    console.log("Loan granted");
+  }
+});
 createUserNames(accounts);
 
 /////////////////////////////////////////////////
@@ -294,3 +308,14 @@ console.log(depositsInUsd);
 
 const acc = accounts.find((mov) => mov.owner === "Jessica Davis");
 console.log(acc);
+
+console.log(
+  accounts
+    .map((mov) => mov.movements)
+    .flat()
+    .reduce((acc, x) => acc + x, 0)
+);
+
+console.log(
+  accounts.flatMap((mov) => mov.movements).reduce((acc, x) => acc + x, 0)
+);
