@@ -319,3 +319,20 @@ console.log(
 console.log(
   accounts.flatMap((mov) => mov.movements).reduce((acc, x) => acc + x, 0)
 );
+
+// setInterval(function () {
+//   const date = new Date();
+//   const hour = date.getHours();
+//   const minute = date.getMinutes();
+//   const sec = date.getSeconds();
+//   console.log(`${hour}:${minute}:${sec} H:M:S`);
+// }, 1000);
+
+const x = [1, 2, 3];
+const y = setTimeout(
+  (a, b, c) => {
+    console.log(a * b * c);
+  },
+  3000,
+  ...x
+);
